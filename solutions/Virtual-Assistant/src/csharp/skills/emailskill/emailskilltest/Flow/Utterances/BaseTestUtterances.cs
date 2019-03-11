@@ -83,28 +83,28 @@ namespace EmailSkillTest.Flow.Utterances
                 Message = message
             };
 
-            if (!string.IsNullOrEmpty(userInput))
-            {
-                emailIntent.Entities.email = emailAdress;
-                if (emailAdress != null)
-                {
-                    emailIntent.Entities._instance.email = new InstanceData[emailAdress.Length];
+            //if (!string.IsNullOrEmpty(userInput))
+            //{
+            //    emailIntent.Entities.email = emailAdress;
+            //    if (emailAdress != null)
+            //    {
+            //        emailIntent.Entities._instance.email = new InstanceData[emailAdress.Length];
 
-                    for (int i = 0; i < emailAdress.Length; i++)
-                    {
-                        var email = emailAdress[i];
-                        var startIndex = userInput.IndexOf(email);
-                        var endIndex = userInput.IndexOf(email) + email.Length;
+            //        for (int i = 0; i < emailAdress.Length; i++)
+            //        {
+            //            var email = emailAdress[i];
+            //            var startIndex = userInput.IndexOf(email);
+            //            var endIndex = userInput.IndexOf(email) + email.Length;
 
-                        InstanceData originalEmailAdress = new InstanceData()
-                        {
-                            StartIndex = startIndex,
-                            EndIndex = endIndex
-                        };
-                        emailIntent.Entities._instance.email[i] = originalEmailAdress;
-                    }
-                }
-            }
+            //            InstanceData originalEmailAdress = new InstanceData()
+            //            {
+            //                StartIndex = startIndex,
+            //                EndIndex = endIndex
+            //            };
+            //            emailIntent.Entities._instance.email[i] = originalEmailAdress;
+            //        }
+            //    }
+            //}
 
             return emailIntent;
         }

@@ -372,20 +372,20 @@ namespace ToDoSkill.Dialogs.Shared
                     state.FoodOfGrocery = entities.FoodOfGrocery[0][0];
                 }
 
-                if (entities.ShopVerb != null && (entities.ShopContent != null || entities.FoodOfGrocery != null))
-                {
-                    state.HasShopVerb = true;
-                }
+                //if (entities.ShopVerb != null && (entities.ShopContent != null || entities.FoodOfGrocery != null))
+                //{
+                //    state.HasShopVerb = true;
+                //}
 
-                if (entities.ShopContent != null)
-                {
-                    state.ShopContent = entities.ShopContent[0];
-                }
+                //if (entities.ShopContent != null)
+                //{
+                //    state.ShopContent = entities.ShopContent[0];
+                //}
 
-                if (entities.TaskContentPattern != null)
-                {
-                    state.TaskContentPattern = entities.TaskContentPattern[0];
-                }
+                //if (entities.TaskContentPattern != null)
+                //{
+                //    state.TaskContentPattern = entities.TaskContentPattern[0];
+                //}
 
                 if (entities.TaskContentML != null)
                 {

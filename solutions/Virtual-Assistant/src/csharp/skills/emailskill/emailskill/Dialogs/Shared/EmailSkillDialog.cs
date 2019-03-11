@@ -1231,21 +1231,21 @@ namespace EmailSkill.Dialogs.Shared
                                     }
                                 }
 
-                                if (entity.email != null)
-                                {
-                                    // As luis result for email address often contains extra spaces for word breaking
-                                    // (e.g. send email to test@test.com, email address entity will be test @ test . com)
-                                    // So use original user input as email address.
-                                    var rawEntity = luisResult.Entities._instance.email;
-                                    foreach (var emailAddress in rawEntity)
-                                    {
-                                        var email = luisResult.Text.Substring(emailAddress.StartIndex, emailAddress.EndIndex - emailAddress.StartIndex);
-                                        if (IsEmail(email) && !state.EmailList.Contains(email))
-                                        {
-                                            state.EmailList.Add(email);
-                                        }
-                                    }
-                                }
+                                //if (entity.email != null)
+                                //{
+                                //    // As luis result for email address often contains extra spaces for word breaking
+                                //    // (e.g. send email to test@test.com, email address entity will be test @ test . com)
+                                //    // So use original user input as email address.
+                                //    var rawEntity = luisResult.Entities._instance.email;
+                                //    foreach (var emailAddress in rawEntity)
+                                //    {
+                                //        var email = luisResult.Text.Substring(emailAddress.StartIndex, emailAddress.EndIndex - emailAddress.StartIndex);
+                                //        if (IsEmail(email) && !state.EmailList.Contains(email))
+                                //        {
+                                //            state.EmailList.Add(email);
+                                //        }
+                                //    }
+                                //}
 
                                 if (entity.SenderName != null)
                                 {
@@ -1289,21 +1289,21 @@ namespace EmailSkill.Dialogs.Shared
                                     }
                                 }
 
-                                if (entity.email != null)
-                                {
-                                    // As luis result for email address often contains extra spaces for word breaking
-                                    // (e.g. send email to test@test.com, email address entity will be test @ test . com)
-                                    // So use original user input as email address.
-                                    var rawEntity = luisResult.Entities._instance.email;
-                                    foreach (var emailAddress in rawEntity)
-                                    {
-                                        var email = luisResult.Text.Substring(emailAddress.StartIndex, emailAddress.EndIndex - emailAddress.StartIndex);
-                                        if (IsEmail(email) && !state.EmailList.Contains(email))
-                                        {
-                                            state.EmailList.Add(email);
-                                        }
-                                    }
-                                }
+                                //if (entity.email != null)
+                                //{
+                                //    // As luis result for email address often contains extra spaces for word breaking
+                                //    // (e.g. send email to test@test.com, email address entity will be test @ test . com)
+                                //    // So use original user input as email address.
+                                //    var rawEntity = luisResult.Entities._instance.email;
+                                //    foreach (var emailAddress in rawEntity)
+                                //    {
+                                //        var email = luisResult.Text.Substring(emailAddress.StartIndex, emailAddress.EndIndex - emailAddress.StartIndex);
+                                //        if (IsEmail(email) && !state.EmailList.Contains(email))
+                                //        {
+                                //            state.EmailList.Add(email);
+                                //        }
+                                //    }
+                                //}
 
                                 if (entity.SenderName != null)
                                 {
