@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using EmailSkill.Dialogs.FindContact;
-using EmailSkill.Dialogs.FindContact.Resources;
 using EmailSkill.Dialogs.ForwardEmail;
 using EmailSkill.Dialogs.Shared.DialogOptions;
 using EmailSkill.Dialogs.Shared.Resources;
@@ -23,12 +22,11 @@ using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Dialogs.Choices;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Solutions.Authentication;
-using Microsoft.Bot.Solutions.Data;
-using Microsoft.Bot.Solutions.Middleware.Telemetry;
 using Microsoft.Bot.Solutions.Prompts;
 using Microsoft.Bot.Solutions.Resources;
 using Microsoft.Bot.Solutions.Responses;
 using Microsoft.Bot.Solutions.Skills;
+using Microsoft.Bot.Solutions.Telemetry;
 using Microsoft.Bot.Solutions.Util;
 using Microsoft.Graph;
 using Microsoft.Recognizers.Text;
@@ -129,6 +127,9 @@ namespace EmailSkill.Dialogs.Shared
                     // Clear email state data
                     await ClearConversationState(sc);
                     await DigestEmailLuisResult(sc, luisResult, true);
+
+                    state.GeneralSearchTexts = state.SearchTexts;
+                    state.GeneralSenderName = state.SenderName;
                 }
 
                 return await sc.NextAsync();
@@ -164,7 +165,6 @@ namespace EmailSkill.Dialogs.Shared
             }
         }
 
-
         protected virtual async Task<DialogTurnResult> PagingStep(WaterfallStepContext sc, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
@@ -176,12 +176,12 @@ namespace EmailSkill.Dialogs.Shared
                 var generalLuisResult = state.GeneralLuisResult;
                 var generalTopIntent = generalLuisResult?.TopIntent().intent;
 
-                if (skillLuisResult == EmailLU.Intent.ShowNext || generalTopIntent == General.Intent.Next)
+                if (skillLuisResult == EmailLU.Intent.ShowNext || generalTopIntent == General.Intent.ShowNext)
                 {
                     state.ShowEmailIndex++;
                     state.ReadEmailIndex = 0;
                 }
-                else if ((skillLuisResult == EmailLU.Intent.ShowPrevious || generalTopIntent == General.Intent.Previous) && state.ShowEmailIndex >= 0)
+                else if ((skillLuisResult == EmailLU.Intent.ShowPrevious || generalTopIntent == General.Intent.ShowPrevious) && state.ShowEmailIndex >= 0)
                 {
                     state.ShowEmailIndex--;
                     state.ReadEmailIndex = 0;
@@ -657,6 +657,8 @@ namespace EmailSkill.Dialogs.Shared
                 }
                 else
                 {
+                    state.MessageList.Clear();
+                    state.Message.Clear();
                     await sc.Context.SendActivityAsync(ResponseManager.GetResponse(EmailSharedResponses.EmailNotFound));
                 }
 
@@ -703,28 +705,9 @@ namespace EmailSkill.Dialogs.Shared
                     var searchSubject = state.SearchTexts?.ToLowerInvariant();
                     var searchUserInput = userInput?.ToLowerInvariant();
 
-                    // Get display messages
-                    var displayMessages = new List<Message>();
-                    for (int i = 0; i < messages.Count(); i++)
-                    {
-                        var messageSender = messages[i].Sender?.EmailAddress?.Name?.ToLowerInvariant();
-                        var messageSubject = messages[i].Subject?.ToLowerInvariant();
+                    messages = FilterMessages(messages, searchSender, searchSubject, searchUserInput);
 
-                        if (messageSender != null
-                            && (((searchSender != null) && messageSender.Contains(searchSender))
-                            || ((searchUserInput != null) && messageSender.Contains(searchUserInput))))
-                        {
-                            displayMessages.Add(messages[i]);
-                        }
-                        else if (messageSubject != null
-                            && (((searchSubject != null) && messageSubject.Contains(searchSubject))
-                            || ((searchUserInput != null) && messageSubject.Contains(searchUserInput))))
-                        {
-                            displayMessages.Add(messages[i]);
-                        }
-                    }
-
-                    state.MessageList = displayMessages;
+                    state.MessageList = messages;
                     state.Message.Clear();
                 }
 
@@ -866,6 +849,37 @@ namespace EmailSkill.Dialogs.Shared
             }
         }
 
+        protected List<Message> FilterMessages(List<Message> messages, string searchSender, string searchSubject, string searchUserInput)
+        {
+            if ((searchSender == null) && (searchSubject == null) && (searchUserInput == null))
+            {
+                return messages;
+            }
+
+            // Get display messages
+            var displayMessages = new List<Message>();
+            for (int i = 0; i < messages.Count(); i++)
+            {
+                var messageSender = messages[i].Sender?.EmailAddress?.Name?.ToLowerInvariant();
+                var messageSubject = messages[i].Subject?.ToLowerInvariant();
+
+                if (messageSender != null
+                    && (((searchSender != null) && messageSender.Contains(searchSender))
+                    || ((searchUserInput != null) && messageSender.Contains(searchUserInput))))
+                {
+                    displayMessages.Add(messages[i]);
+                }
+                else if (messageSubject != null
+                    && (((searchSubject != null) && messageSubject.Contains(searchSubject))
+                    || ((searchUserInput != null) && messageSubject.Contains(searchUserInput))))
+                {
+                    displayMessages.Add(messages[i]);
+                }
+            }
+
+            return displayMessages;
+        }
+
         protected async Task<(List<Message>, int)> GetMessagesAsync(WaterfallStepContext sc)
         {
             var result = new List<Message>();
@@ -882,20 +896,14 @@ namespace EmailSkill.Dialogs.Shared
             var directlyToMe = state.DirectlyToMe;
             var skip = state.ShowEmailIndex * pageSize;
             string mailAddress = null;
-            if (!string.IsNullOrEmpty(state.SenderName))
-            {
-                var searchResult = await GetPeopleWorkWithAsync(sc.Context, state.SenderName);
-                var user = searchResult.FirstOrDefault();
-                if (user != null)
-                {
-                    // maybe we should only show unread email from somebody
-                    // isRead = true;
-                    mailAddress = user.ScoredEmailAddresses.FirstOrDefault()?.Address ?? user.UserPrincipalName;
-                }
-            }
 
             // Get user message.
             result = await serivce.GetMyMessagesAsync(startDateTime, endDateTime, isUnreadOnly, isImportant, directlyToMe, mailAddress);
+
+            // Filter messages
+            var searchSender = state.GeneralSenderName?.ToLowerInvariant();
+            var searchSubject = state.GeneralSearchTexts?.ToLowerInvariant();
+            result = FilterMessages(result, searchSender, searchSubject, null);
 
             // Go back to last page if next page didn't get anything
             if (skip >= result.Count)
@@ -980,10 +988,10 @@ namespace EmailSkill.Dialogs.Shared
             }
             else
             {
-                reply = ResponseManager.GetCardResponse(EmailSharedResponses.ShowEmailPrompt_OtherPage, cards, tokens);
+                reply = ResponseManager.GetCardResponse(EmailSharedResponses.ShowEmailPromptOtherPage, cards, tokens);
                 if (updatedMessages.Count == 1)
                 {
-                    reply = ResponseManager.GetCardResponse(EmailSharedResponses.ShowOneEmailPrompt_OtherPage, cards, tokens);
+                    reply = ResponseManager.GetCardResponse(EmailSharedResponses.ShowOneEmailPromptOtherPage, cards, tokens);
                 }
             }
 
@@ -1092,6 +1100,8 @@ namespace EmailSkill.Dialogs.Shared
                 state.ReadRecipientIndex = 0;
                 state.RecipientChoiceList.Clear();
                 state.SearchTexts = null;
+                state.GeneralSenderName = null;
+                state.GeneralSearchTexts = null;
             }
             catch (Exception)
             {
@@ -1182,6 +1192,8 @@ namespace EmailSkill.Dialogs.Shared
                         case EmailLU.Intent.CheckMessages:
                         case EmailLU.Intent.SearchMessages:
                         case EmailLU.Intent.ReadAloud:
+                        case EmailLU.Intent.ShowNext:
+                        case EmailLU.Intent.ShowPrevious:
                             {
                                 // Get email search type
                                 if (dc.Context.Activity.Text != null)
@@ -1235,20 +1247,12 @@ namespace EmailSkill.Dialogs.Shared
                                     }
                                 }
 
-                                if (entity.SenderNamePattern != null)
-                                {
-                                    state.SenderName = entity.SenderNamePattern[0];
-                                }
-                                else if (entity.SenderName != null)
+                                if (entity.SenderName != null)
                                 {
                                     state.SenderName = entity.SenderName[0];
                                 }
 
-                                if (entity.EmailSubjectPattern != null)
-                                {
-                                    state.SearchTexts = entity.EmailSubjectPattern[0];
-                                }
-                                else if (entity.SearchTexts != null)
+                                if (entity.SearchTexts != null)
                                 {
                                     state.SearchTexts = entity.SearchTexts[0];
                                 }
@@ -1336,7 +1340,7 @@ namespace EmailSkill.Dialogs.Shared
         protected bool IsReadMoreIntent(General.Intent? topIntent, string userInput)
         {
             var isReadMoreUserInput = userInput == null ? false : userInput.ToLowerInvariant().Contains(CommonStrings.More);
-            return topIntent == General.Intent.ReadMore && isReadMoreUserInput;
+            return topIntent == General.Intent.ShowNext && isReadMoreUserInput;
         }
 
         // This method is called by any waterfall step that throws an exception to ensure consistency
@@ -1369,7 +1373,11 @@ namespace EmailSkill.Dialogs.Shared
             // send error message to bot user
             if (ex.ExceptionType == SkillExceptionType.APIAccessDenied)
             {
-                await sc.Context.SendActivityAsync(ResponseManager.GetResponse(EmailSharedResponses.EmailErrorMessage_BotProblem));
+                await sc.Context.SendActivityAsync(ResponseManager.GetResponse(EmailSharedResponses.EmailErrorMessageBotProblem));
+            }
+            else if (ex.ExceptionType == SkillExceptionType.AccountNotActivated)
+            {
+                await sc.Context.SendActivityAsync(ResponseManager.GetResponse(EmailSharedResponses.EmailErrorMessageAccountProblem));
             }
             else
             {

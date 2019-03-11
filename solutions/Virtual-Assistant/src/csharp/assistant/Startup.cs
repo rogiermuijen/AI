@@ -16,11 +16,10 @@ using Microsoft.Bot.Configuration;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.Bot.Solutions.Middleware;
-using Microsoft.Bot.Solutions.Middleware.Telemetry;
-using Microsoft.Bot.Solutions.Model;
-using Microsoft.Bot.Solutions.Models.Proactive;
+using Microsoft.Bot.Solutions.Proactive;
 using Microsoft.Bot.Solutions.Skills;
 using Microsoft.Bot.Solutions.TaskExtensions;
+using Microsoft.Bot.Solutions.Telemetry;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VirtualAssistant.Dialogs.Main;
@@ -44,6 +43,11 @@ namespace VirtualAssistant
             if (File.Exists(Path.Combine(env.ContentRootPath, SkillEventsConfigFile)))
             {
                 builder.AddJsonFile(SkillEventsConfigFile, optional: true);
+            }
+
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
             }
 
             Configuration = builder.Build();
@@ -145,17 +149,6 @@ namespace VirtualAssistant
                 options.Middleware.Add(new EventDebuggerMiddleware());
                 options.Middleware.Add(new AutoSaveStateMiddleware(userState, conversationState));
                 options.Middleware.Add(new ProactiveStateMiddleware(proactiveState));
-
-                //// Translator is an optional component for scenarios when an Assistant needs to work beyond native language support
-                // var translatorKey = Configuration.GetValue<string>("translatorKey");
-                // if (!string.IsNullOrEmpty(translatorKey))
-                // {
-                //     options.Middleware.Add(new TranslationMiddleware(new string[] { "en", "fr", "it", "de", "es" }, translatorKey, false));
-                // }
-                // else
-                // {
-                //     throw new InvalidOperationException("Microsoft Text Translation API key is missing. Please add your translation key to the 'translatorKey' setting.");
-                // }
             });
         }
 

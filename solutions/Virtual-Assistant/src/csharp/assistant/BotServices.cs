@@ -11,9 +11,8 @@ using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Bot.Builder.AI.QnA;
 using Microsoft.Bot.Builder.Azure;
 using Microsoft.Bot.Configuration;
-using Microsoft.Bot.Solutions.Middleware.Telemetry;
-using Microsoft.Bot.Solutions.Model;
 using Microsoft.Bot.Solutions.Skills;
+using Microsoft.Bot.Solutions.Telemetry;
 
 namespace VirtualAssistant
 {
@@ -29,7 +28,7 @@ namespace VirtualAssistant
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BotServices"/> class.
-        /// Default constructor to enable different instantiation of the BotConfiguration (e.g. mocking and other adapters which won't use the Bot file
+        /// Default constructor to enable different instantiation of the BotConfiguration (e.g. mocking and other adapters which won't use the Bot file.
         /// </summary>
         public BotServices()
         {

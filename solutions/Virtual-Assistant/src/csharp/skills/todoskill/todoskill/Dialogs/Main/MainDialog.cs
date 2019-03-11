@@ -19,7 +19,6 @@ using ToDoSkill.Dialogs.DeleteToDo;
 using ToDoSkill.Dialogs.Main.Resources;
 using ToDoSkill.Dialogs.MarkToDo;
 using ToDoSkill.Dialogs.Shared.DialogOptions;
-using ToDoSkill.Dialogs.Shared.Resources;
 using ToDoSkill.Dialogs.ShowToDo;
 using ToDoSkill.ServiceClients;
 using static ToDoSkill.Dialogs.Shared.ServiceProviderTypes;
@@ -123,6 +122,8 @@ namespace ToDoSkill.Dialogs.Main
                             break;
                         }
 
+                    case ToDoLU.Intent.ShowNextPage:
+                    case ToDoLU.Intent.ShowPreviousPage:
                     case ToDoLU.Intent.ShowToDo:
                         {
                             turnResult = await dc.BeginDialogAsync(nameof(ShowToDoItemDialog), skillOptions);
@@ -131,9 +132,8 @@ namespace ToDoSkill.Dialogs.Main
 
                     case ToDoLU.Intent.None:
                         {
-                            if (generalTopIntent == General.Intent.Next
-                                || generalTopIntent == General.Intent.Previous
-                                || generalTopIntent == General.Intent.ReadMore)
+                            if (generalTopIntent == General.Intent.ShowNext
+                                || generalTopIntent == General.Intent.ShowPrevious)
                             {
                                 turnResult = await dc.BeginDialogAsync(nameof(ShowToDoItemDialog), skillOptions);
                             }
