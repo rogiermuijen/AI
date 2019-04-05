@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Virtual Assistant MKII</string>
+
+    <!-- Messages for User -->
+    <string name="msg_listening" translatable="false">I am listening…</string>
+    <string name="msg_listening_not" translatable="false">I am no longer listening…</string>
+
+    <!-- General Strings -->
+    <string name="bot_input_hint" translatable="false">Type text for the bot</string>
+
+</resources>

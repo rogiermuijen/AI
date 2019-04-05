@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <!-- FAB -->
+    <color name="color_fab_listening">#43a047</color><!-- Green 600 -->
+    <color name="color_fab_listening_not">#e53935</color><!-- Red 600 -->
+</resources>
