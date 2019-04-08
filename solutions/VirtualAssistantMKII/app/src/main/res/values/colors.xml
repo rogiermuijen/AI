@@ -5,6 +5,6 @@
     <color name="colorAccent">#D81B60</color>
 
     <!-- FAB -->
-    <color name="color_fab_listening">#43a047</color><!-- Green 600 -->
+    <color name="color_fab_listening">#43a047</color><!-- Green 600 -->v
     <color name="color_fab_listening_not">#e53935</color><!-- Red 600 -->
 </resources>

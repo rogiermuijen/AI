@@ -43,9 +43,13 @@ public class MainActivity extends BaseActivity {
             isListening = !isListening; //toggle listening state
             setFabColor(fabMic, fabColor);
         });
+
+        requestDangerousPermissions();
     }
 
     private void setFabColor(FloatingActionButton fab, int color){
         fab.setSupportBackgroundTintList(ColorStateList.valueOf(color));
     }
+
+
 }

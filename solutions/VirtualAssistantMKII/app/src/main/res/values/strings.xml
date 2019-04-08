@@ -1,7 +1,15 @@
 <resources>
     <string name="app_name">Virtual Assistant MKII</string>
 
-    <!-- Messages for User -->
+    <!-- Permissions -->
+    <string name="permission_record_audio_title" translatable="false">Permission to record audio</string>
+    <string name="permission_record_audio_rationale" translatable="false">In order for this app to listen to your voice, it requires permission to record audio</string>
+    <string name="permission_record_audio_denied" translatable="false">You will only be able to type to the Bot</string>
+    <string name="permission_write_external_storage_title" translatable="false">Permission to store data</string>
+    <string name="permission_write_external_storage_rationale" translatable="false">This app needs to store files in order to function</string>
+    <string name="permission_write_external_storage_denied" translatable="false">The app will not be able to download large files</string>
+
+    <!-- General Messages for User -->
     <string name="msg_listening" translatable="false">I am listening…</string>
     <string name="msg_listening_not" translatable="false">I am no longer listening…</string>
 
