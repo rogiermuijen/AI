@@ -23,6 +23,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     private static final Integer PERMISSION_REQUEST_RECORD_AUDIO = 101;
     private static final Integer PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 102;
 
+    protected abstract void permissionDenied(String manifestPermission);
+    protected abstract void permissionGranted(String manifestPermission);
+
     protected void showSnackbar(View view, String message){
         Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
                 .setAction("Action", null)
@@ -34,7 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity {
      * If the permission has been denied previously, a dialog with extra rationale info will prompt
      * the user to grant the permission, otherwise it is requested directly.
      */
-    protected void requestDangerousPermissions() {
+    protected void requestRecordAudioPermissions() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
             // Provide an additional rationale to the user if the permission was not granted
             // and the user would benefit from additional context for the use of the permission.
@@ -56,7 +59,9 @@ public abstract class BaseActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     PERMISSION_REQUEST_RECORD_AUDIO);
         }
+    }
 
+    protected void requestWriteExternalPermissions() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             // Provide an additional rationale to the user if the permission was not granted
             // and the user would benefit from additional context for the use of the permission.
@@ -90,18 +95,20 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (requestCode == PERMISSION_REQUEST_RECORD_AUDIO) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // RECORD_AUDIO permission has been granted
-                // nothing else needs to be done
-            } else {
-                InteractionUtils.showMessageDialogOk(
-                        this,
-                        getString(R.string.permission_record_audio_title),
-                        getString(R.string.permission_record_audio_denied),
-                        new InteractionUtils.InteractionCallback(){
-                            @Override
-                            public void dialogClickOK() {
-                                // empty
-                            }
-                        });
+                permissionGranted(Manifest.permission.RECORD_AUDIO);
+            }
+            else {
+//                InteractionUtils.showMessageDialogOk(
+//                        this,
+//                        getString(R.string.permission_record_audio_title),
+//                        getString(R.string.permission_record_audio_denied),
+//                        new InteractionUtils.InteractionCallback(){
+//                            @Override
+//                            public void dialogClickOK() {
+//                                // empty
+//                            }
+//                        });
+                permissionDenied(Manifest.permission.RECORD_AUDIO);
             }
         }
 
@@ -110,7 +117,8 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // WRITE_EXTERNAL_STORAGE permission has been granted
                 // nothing else needs to be done
-            } else {
+            }
+            else {
                 InteractionUtils.showMessageDialogOk(
                         this,
                         getString(R.string.permission_write_external_storage_title),

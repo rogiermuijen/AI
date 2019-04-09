@@ -1,16 +1,23 @@
 package com.microsoft.bot.builder.solutions.virtualassistant.activities;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 
+import com.microsoft.bot.builder.solutions.directlinespeech.SpeechSdk;
 import com.microsoft.bot.builder.solutions.virtualassistant.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnEditorAction;
 
 public class MainActivity extends BaseActivity {
 
@@ -24,6 +31,7 @@ public class MainActivity extends BaseActivity {
 
     // STATE
     private boolean isListening;
+    private SpeechSdk speechSdk;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +52,50 @@ public class MainActivity extends BaseActivity {
             setFabColor(fabMic, fabColor);
         });
 
-        requestDangerousPermissions();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            requestRecordAudioPermissions();
+        } else {
+            initializeSpeechSdk(true);
+        }
+    }
+
+    @Override
+    protected void permissionDenied(String manifestPermission) {
+        if (manifestPermission.equals(Manifest.permission.RECORD_AUDIO)){
+            initializeSpeechSdk(false);
+            fabMic.hide();
+        }
+    }
+
+    @Override
+    protected void permissionGranted(String manifestPermission) {
+        if (manifestPermission.equals(Manifest.permission.RECORD_AUDIO)){
+            initializeSpeechSdk(true);
+        }
+    }
+
+    private void initializeSpeechSdk(boolean haveRecordAudioPermission){
+        if (speechSdk == null) {
+            speechSdk = new SpeechSdk();
+            speechSdk.initialize(null, haveRecordAudioPermission);
+        }
     }
 
     private void setFabColor(FloatingActionButton fab, int color){
         fab.setSupportBackgroundTintList(ColorStateList.valueOf(color));
     }
 
+    @OnEditorAction(R.id.textinput)
+    boolean onEditorAction(int actionId, KeyEvent key){
+        boolean handled = false;
+        if (actionId == EditorInfo.IME_ACTION_SEND) {
+            sendTextMessage(textInput.getEditableText().toString());
+            handled = true;
+        }
+        return handled;
+    }
 
+    private void sendTextMessage(String msg){
+        speechSdk.sendActivity(msg);
+    }
 }

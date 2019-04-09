@@ -42,7 +42,8 @@
             android:id="@+id/textinput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text|textAutoComplete"/>
+            android:imeOptions="actionSend"
+            android:inputType="text|textCapSentences|textAutoComplete|textAutoCorrect"/>
     </android.support.design.widget.TextInputLayout>
 
 

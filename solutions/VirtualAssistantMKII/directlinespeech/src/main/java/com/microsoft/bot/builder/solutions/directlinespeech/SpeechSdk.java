@@ -29,14 +29,16 @@ public class SpeechSdk {
     private HashMap<String, PipedOutputStream> audioMap = new HashMap<>();
 
     //TODO pass the configuration by the 3rd party dev
-    public void initialize(SpeechConfiguration configuration){
+    public void initialize(SpeechConfiguration configuration, boolean haveRecordAudioPermission){
         synthesizer = new Synthesizer();
-        initializeSpeech(configuration);
+        initializeSpeech(configuration, haveRecordAudioPermission);
     }
 
-    private void initializeSpeech(SpeechConfiguration configuration){
+    private void initializeSpeech(SpeechConfiguration configuration, boolean haveRecordAudioPermission){
         //final AudioConfig audioInput = AudioConfig.fromDefaultMicrophoneInput();
-        final AudioConfig audioInput = AudioConfig.fromStreamInput(createMicrophoneStream());
+        AudioConfig audioInput = null;
+        if (haveRecordAudioPermission) audioInput = AudioConfig.fromStreamInput(createMicrophoneStream());
+
         BotConnectorConfig botConfig = BotConnectorConfig.fromBotConnectionId(
                 SpeechConfiguration.BotId,
                 SpeechConfiguration.CognitiveServicesSubscriptionKey,
@@ -166,6 +168,7 @@ public class SpeechSdk {
         Future<Void> task = botConnector.connectAsync();
         setOnTaskCompletedListener(task, result -> {
             // your code here
+            Log.d("test", "Connected");
         });
     }
 
@@ -193,7 +196,7 @@ public class SpeechSdk {
             BotConnectorActivity activity = BotConnectorActivity.fromSerializedActivity(s);
             final Future<Void> task = botConnector.sendActivityAsync(activity);
             setOnTaskCompletedListener(task, result -> {
-                // your code here
+                Log.d("test","sendActivityAsync done");
             });
         }
     }

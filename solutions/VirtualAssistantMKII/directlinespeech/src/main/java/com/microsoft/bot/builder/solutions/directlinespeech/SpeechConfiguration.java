@@ -4,10 +4,10 @@ package com.microsoft.bot.builder.solutions.directlinespeech;
 public class SpeechConfiguration {
 
     // Replace below with your own subscription key
-    public static final String CognitiveServicesSubscriptionKey = "488c50db58da43988eba30185ee4bf6f";
+    public static final String CognitiveServicesSubscriptionKey = "2f815ba89d7d4503a78dc7307026befd";
 
     // Replace below with your own Bot ID (from the Speech Channel configuration page)
-    public static final String BotId = "BFVirtualAssistant";
+    public static final String BotId = "SpeechAssistantDev";
 
     // Replace below with your own service region (e.g., "westus").
     public static final String SpeechRegion = "westus2";
