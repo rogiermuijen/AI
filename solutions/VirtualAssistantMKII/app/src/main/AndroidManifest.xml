@@ -5,8 +5,7 @@
     <!-- for an overview of permissions, see :
     https://developer.android.com/guide/topics/permissions/overview -->
 
-    <!-- NORMAL -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+
 
     <!-- DANGEROUS -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />

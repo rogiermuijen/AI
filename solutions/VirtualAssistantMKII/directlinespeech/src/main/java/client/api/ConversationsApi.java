@@ -35,6 +35,7 @@ import client.model.Activity;
 import client.model.ActivitySet;
 import client.model.Conversation;
 import client.model.ResourceResponse;
+import io.reactivex.Single;
 
 public class ConversationsApi {
     private ApiClient apiClient;
@@ -508,9 +509,16 @@ public class ConversationsApi {
      * @return Conversation
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public Conversation conversationsStartConversation() throws ApiException {
-        ApiResponse<Conversation> resp = conversationsStartConversationWithHttpInfo();
-        return resp.getData();
+
+    public Single<Conversation> conversationsStartConversation() throws ApiException {
+        //return Single.just(conversationsStartConversationWithHttpInfo().getData());
+        return Single.create(emitter -> {
+            ApiResponse<Conversation> response = conversationsStartConversationWithHttpInfo();
+            if (response != null)
+                emitter.onSuccess(response.getData());
+            else
+                emitter.onError(new RuntimeException("null response"));
+        });
     }
 
     /**

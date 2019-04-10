@@ -12,12 +12,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 
+import com.microsoft.bot.builder.solutions.directlinespeech.ConversationSdk;
 import com.microsoft.bot.builder.solutions.directlinespeech.SpeechSdk;
 import com.microsoft.bot.builder.solutions.virtualassistant.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnEditorAction;
+import client.JSON;
+import client.WebSocketServerConnection;
 
 public class MainActivity extends BaseActivity {
 
@@ -32,6 +35,9 @@ public class MainActivity extends BaseActivity {
     // STATE
     private boolean isListening;
     private SpeechSdk speechSdk;
+    private ConversationSdk conversationSdk;
+    private WebSocketServerConnection mServerConnection;
+    private JSON json = new JSON();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +58,15 @@ public class MainActivity extends BaseActivity {
             setFabColor(fabMic, fabColor);
         });
 
+        // handle dangerous permisisons
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             requestRecordAudioPermissions();
         } else {
             initializeSpeechSdk(true);
         }
+
+        // doesn't require dangerous permissions
+        initializeConversationSdk();
     }
 
     @Override
@@ -78,6 +88,14 @@ public class MainActivity extends BaseActivity {
         if (speechSdk == null) {
             speechSdk = new SpeechSdk();
             speechSdk.initialize(null, haveRecordAudioPermission);
+        }
+    }
+
+    private void initializeConversationSdk(){
+        if (conversationSdk == null) {
+            conversationSdk = new ConversationSdk(this);
+            //conversationSdk.initialize();
+            conversationSdk.startConversation();
         }
     }
 
