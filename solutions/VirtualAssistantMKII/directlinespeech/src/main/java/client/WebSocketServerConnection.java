@@ -26,6 +26,8 @@ package client;
 import android.os.Handler;
 import android.os.Message;
 
+import com.microsoft.bot.builder.solutions.directlinespeech.InterceptorLogging;
+
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -85,7 +87,9 @@ public class WebSocketServerConnection {
                 .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS, ConnectionSpec.COMPATIBLE_TLS))
                 .readTimeout(3,  TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
+                .addInterceptor(new InterceptorLogging())
                 .build();
+
         mServerUrl = url;
     }
 

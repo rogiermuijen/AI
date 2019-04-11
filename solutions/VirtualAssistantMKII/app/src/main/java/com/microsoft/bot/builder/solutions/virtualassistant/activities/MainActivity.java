@@ -68,7 +68,7 @@ public class MainActivity extends BaseActivity implements ConversationListener {
         }
 
         // doesn't require dangerous permissions
-        initializeConversationSdk();
+//        initializeConversationSdk();
     }
 
     @Override
@@ -90,15 +90,16 @@ public class MainActivity extends BaseActivity implements ConversationListener {
         if (speechSdk == null) {
             speechSdk = new SpeechSdk();
             speechSdk.initialize(null, haveRecordAudioPermission);
+            speechSdk.connect();
         }
     }
 
-    private void initializeConversationSdk(){
-        if (conversationSdk == null) {
-            conversationSdk = new ConversationSdk(this);
-            conversationSdk.createConversationConnection(this);
-        }
-    }
+//    private void initializeConversationSdk(){
+//        if (conversationSdk == null) {
+//            conversationSdk = new ConversationSdk(this);
+//            conversationSdk.createConversationConnection(this);
+//        }
+//    }
 
     private void setFabColor(FloatingActionButton fab, int color){
         fab.setSupportBackgroundTintList(ColorStateList.valueOf(color));

@@ -48,12 +48,28 @@ public class ConversationSdk implements WebSocketServerConnection.ServerListener
         this.conversation = null;
     }
 
+    // Destructor
+
+    @Override
+    protected void finalize() throws Throwable {
+        clearDisposables();
+        super.finalize();
+    }
+
 
     // Concrete implementation of WebSocketServerConnection.ServerListener
 
     @Override
     public void onNewMessage(String message) {
         Log.v(LOGTAG,"onNewMessage: "+message);
+        if(message != null && message.length()>0) {
+
+//                ActivitySet activitySet = json.deserialize(message, ActivitySet.class);
+//                if(activitySet != null){
+//                    ParseBotActivitiesToSpeech(activitySet.getActivities());
+//                }
+        }
+
     }
 
     @Override
@@ -96,6 +112,7 @@ public class ConversationSdk implements WebSocketServerConnection.ServerListener
                             this.conversation = conversation;//keep a reference
                             mServerConnection = new WebSocketServerConnection(conversation.getStreamUrl());
                             mServerConnection.Connect(this);
+                            Log.v(LOGTAG, conversation.toString());
                             Log.v(LOGTAG, "successfully connected");
                             this.conversationListener.serverConnected();
                         },

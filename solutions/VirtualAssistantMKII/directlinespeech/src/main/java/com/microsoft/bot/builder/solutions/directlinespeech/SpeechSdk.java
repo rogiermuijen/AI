@@ -3,6 +3,7 @@ package com.microsoft.bot.builder.solutions.directlinespeech;
 import android.util.Log;
 
 import com.microsoft.cognitiveservices.speech.ResultReason;
+import com.microsoft.cognitiveservices.speech.SpeechRecognitionCanceledEventArgs;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
 import com.microsoft.cognitiveservices.speech.dialog.BotConnectorActivity;
 import com.microsoft.cognitiveservices.speech.dialog.BotConnectorConfig;
@@ -11,10 +12,12 @@ import com.microsoft.cognitiveservices.speech.dialog.SpeechBotConnector;
 import java.io.IOException;
 import java.io.PipedOutputStream;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import client.model.Activity;
+import client.model.ActivityTypes;
 
 public class SpeechSdk {
 
@@ -68,7 +71,7 @@ public class SpeechSdk {
             //TODO trigger callback to expose result in 3rd party app
         });
 
-        botConnector.canceled.addEventListener((o, canceledEventArgs) -> {
+        botConnector.canceled.addEventListener((Object o, SpeechRecognitionCanceledEventArgs canceledEventArgs) -> {
             Log.i("test", "canceled (" + canceledEventArgs.getErrorDetails());
             final Future<Void> task = botConnector.disconnectAsync();
 //            setOnTaskCompletedListener(task, result -> {
@@ -187,13 +190,19 @@ public class SpeechSdk {
     }
 
     public void sendActivity(CharSequence chars) {
-        final String activityTemplate = "{\"type\": \"button\", \"text\" : \"\", \"entities\": [{ \"color\": \"%2s\" }] }";
+        //final String activityTemplate = "{\"type\": \"button\", \"text\" : \"%1s\", \"entities\": [{ \"color\": \"%2s\" }] }";
+
+        final Activity activityTemplate = new Activity();
+        activityTemplate.text((String)chars);
+        activityTemplate.type(ActivityTypes.MESSAGE);
 
         if (botConnector != null) {
-            UUID u = UUID.randomUUID();
-            String randomUUIDString = u.toString();
-            String s = String.format(activityTemplate, randomUUIDString, chars);
-            BotConnectorActivity activity = BotConnectorActivity.fromSerializedActivity(s);
+//            UUID u = UUID.randomUUID();
+//            String randomUUIDString = u.toString();
+//            String s = String.format(activityTemplate, randomUUIDString, chars);
+            String temp = activityTemplate.toString();
+            BotConnectorActivity activity = BotConnectorActivity.fromSerializedActivity(temp);
+
             final Future<Void> task = botConnector.sendActivityAsync(activity);
             setOnTaskCompletedListener(task, result -> {
                 Log.d("test","sendActivityAsync done");

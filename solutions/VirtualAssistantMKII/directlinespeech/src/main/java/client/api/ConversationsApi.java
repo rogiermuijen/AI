@@ -13,6 +13,8 @@
 
 package client.api;
 
+import android.util.Log;
+
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;

@@ -9,7 +9,7 @@ public class ConversationConfiguration {
     public static String UserName = "User";
     public static String UserId = "";
     public static String Locale = "";
-    public static String DirectLineSecret = "Q6nJMjE3aiU.cwA.Prs.FbfZ2ZH0pDVXop14wnHUgtIkcAiHM6PbwLHwiOldqEs";
+    public static String DirectLineSecret = "VzbkbMkGU8g.e6yTy4Hl6VbBlH1GwFYD6FUlC8GPmtRO4xL6q0OCTw4";//"Q6nJMjE3aiU.cwA.Prs.FbfZ2ZH0pDVXop14wnHUgtIkcAiHM6PbwLHwiOldqEs";
     public static InputHints DefaultInputHint;
 
     public static String StartConversationEvent = "startConversation";
