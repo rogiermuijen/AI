@@ -9,9 +9,12 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 
+import com.microsoft.bot.builder.solutions.directlinespeech.ConversationConfiguration;
+import com.microsoft.bot.builder.solutions.directlinespeech.ConversationListener;
 import com.microsoft.bot.builder.solutions.directlinespeech.ConversationSdk;
 import com.microsoft.bot.builder.solutions.directlinespeech.SpeechSdk;
 import com.microsoft.bot.builder.solutions.virtualassistant.R;
@@ -19,10 +22,9 @@ import com.microsoft.bot.builder.solutions.virtualassistant.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnEditorAction;
-import client.JSON;
-import client.WebSocketServerConnection;
+import client.ApiException;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements ConversationListener {
 
     // VIEWS
     @BindView(R.id.recyclerview) RecyclerView recyclerview;
@@ -31,13 +33,13 @@ public class MainActivity extends BaseActivity {
 
     // CONSTANTS
     private final int CONTENT_VIEW = R.layout.activity_main;
+    private static final String LOGTAG = "MainActivity";
 
     // STATE
     private boolean isListening;
     private SpeechSdk speechSdk;
     private ConversationSdk conversationSdk;
-    private WebSocketServerConnection mServerConnection;
-    private JSON json = new JSON();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +96,7 @@ public class MainActivity extends BaseActivity {
     private void initializeConversationSdk(){
         if (conversationSdk == null) {
             conversationSdk = new ConversationSdk(this);
-            //conversationSdk.initialize();
-            conversationSdk.startConversation();
+            conversationSdk.createConversationConnection(this);
         }
     }
 
@@ -115,5 +116,29 @@ public class MainActivity extends BaseActivity {
 
     private void sendTextMessage(String msg){
         speechSdk.sendActivity(msg);
+    }
+
+    // Concrete ConversationListener implementation
+
+    @Override
+    public void serverConnected() {
+        try{
+            conversationSdk.sendStartConversationEvent();
+            conversationSdk.sendVirtualAssistantTimeZoneEvent();
+            conversationSdk.sendVirtualAssistantLocationEvent(ConversationConfiguration.Latitude, ConversationConfiguration.Longitude);
+        } catch (ApiException e){
+            Log.e(LOGTAG, e.toString());
+        }
+
+    }
+
+    @Override
+    public void serverConnectionFailed(String message) {
+        Log.e(LOGTAG, message);
+    }
+
+    @Override
+    public void noConnectivity() {
+        Log.e(LOGTAG, "no connectivity");
     }
 }

@@ -11,4 +11,11 @@ public class ConversationConfiguration {
     public static String Locale = "";
     public static String DirectLineSecret = "Q6nJMjE3aiU.cwA.Prs.FbfZ2ZH0pDVXop14wnHUgtIkcAiHM6PbwLHwiOldqEs";
     public static InputHints DefaultInputHint;
+
+    public static String StartConversationEvent = "startConversation";
+    public static String IPATimezoneEvent = "IPA.Timezone";
+    public static String IPALocationEvent = "IPA.Location";
+    public static String Latitude = "47.631936";
+    public static String Longitude = "-122.136301";
+
 }

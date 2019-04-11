@@ -263,9 +263,14 @@ public class ConversationsApi {
      * @return ResourceResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ResourceResponse conversationsPostActivity(String conversationId, Activity activity) throws ApiException {
-        ApiResponse<ResourceResponse> resp = conversationsPostActivityWithHttpInfo(conversationId, activity);
-        return resp.getData();
+    public Single<ResourceResponse> conversationsPostActivity(String conversationId, Activity activity) throws ApiException {
+        return Single.create(emitter -> {
+            ApiResponse<ResourceResponse> resp = conversationsPostActivityWithHttpInfo(conversationId, activity);
+            if (resp != null)
+                emitter.onSuccess(resp.getData());
+            else
+                emitter.onError(new RuntimeException("null response"));
+        });
     }
 
     /**
@@ -511,7 +516,6 @@ public class ConversationsApi {
      */
 
     public Single<Conversation> conversationsStartConversation() throws ApiException {
-        //return Single.just(conversationsStartConversationWithHttpInfo().getData());
         return Single.create(emitter -> {
             ApiResponse<Conversation> response = conversationsStartConversationWithHttpInfo();
             if (response != null)
