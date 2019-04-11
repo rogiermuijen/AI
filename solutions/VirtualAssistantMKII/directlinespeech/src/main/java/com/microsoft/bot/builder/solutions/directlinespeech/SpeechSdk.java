@@ -2,6 +2,7 @@ package com.microsoft.bot.builder.solutions.directlinespeech;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.microsoft.cognitiveservices.speech.ResultReason;
 import com.microsoft.cognitiveservices.speech.SpeechRecognitionCanceledEventArgs;
 import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
@@ -30,9 +31,11 @@ public class SpeechSdk {
     private SpeechBotConnector botConnector;
     private Synthesizer synthesizer;
     private HashMap<String, PipedOutputStream> audioMap = new HashMap<>();
+    private Gson gson;
 
     //TODO pass the configuration by the 3rd party dev
     public void initialize(SpeechConfiguration configuration, boolean haveRecordAudioPermission){
+        gson = new Gson();
         synthesizer = new Synthesizer();
         initializeSpeech(configuration, haveRecordAudioPermission);
     }
@@ -190,18 +193,14 @@ public class SpeechSdk {
     }
 
     public void sendActivity(CharSequence chars) {
-        //final String activityTemplate = "{\"type\": \"button\", \"text\" : \"%1s\", \"entities\": [{ \"color\": \"%2s\" }] }";
-
-        final Activity activityTemplate = new Activity();
-        activityTemplate.text((String)chars);
-        activityTemplate.type(ActivityTypes.MESSAGE);
-
         if (botConnector != null) {
-//            UUID u = UUID.randomUUID();
-//            String randomUUIDString = u.toString();
-//            String s = String.format(activityTemplate, randomUUIDString, chars);
-            String temp = activityTemplate.toString();
-            BotConnectorActivity activity = BotConnectorActivity.fromSerializedActivity(temp);
+
+            final Activity activityTemplate = new Activity();
+            activityTemplate.text((String)chars);
+            activityTemplate.type(ActivityTypes.MESSAGE);
+
+            String activityJson = gson.toJson(activityTemplate);
+            BotConnectorActivity activity = BotConnectorActivity.fromSerializedActivity(activityJson);
 
             final Future<Void> task = botConnector.sendActivityAsync(activity);
             setOnTaskCompletedListener(task, result -> {
